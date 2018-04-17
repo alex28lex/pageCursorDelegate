@@ -59,9 +59,7 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.GalleryIma
 
         holder.categoryText.setText(imageItemDto.getName());
         Glide.with(holder.image.getContext())
-                .load(imageItemDto.getUrl())
-                .dontAnimate()
-                .diskCacheStrategy(DiskCacheStrategy.ALL).into(holder.image);
+                .load(imageItemDto.getUrl());
     }
 
 

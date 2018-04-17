@@ -1,6 +1,7 @@
 package com.example.pagination.pagination;
 
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -31,6 +32,9 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.progress)
     protected ProgressBar progressBar;
 
+    @BindView(R.id.swipe_refresh_layout)
+    protected SwipeRefreshLayout swipeRefreshLayout;
+
     private ImagesAdapter adapter;
 
     @Override
@@ -38,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        initSwipeRefreshLayout();
 
         adapter = new ImagesAdapter();
         imagesDataSource = new ImagesRestMockDataSource();
@@ -74,6 +79,16 @@ public class MainActivity extends AppCompatActivity {
         pageCursorDelegate.release();
     }
 
+    protected void initSwipeRefreshLayout() {
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                loadImagesRequest();
+            }
+        });
+    }
+
     private void paginateImagesRequest(int lastVisiblePosition, int adapteritemsCount) {
         pageCursorDelegate.paginate(lastVisiblePosition, adapteritemsCount, new PageCursorDelegate.LoadListener<ImageDataDto>() {
             @Override
@@ -99,19 +114,19 @@ public class MainActivity extends AppCompatActivity {
         pageCursorDelegate.refresh(new PageCursorDelegate.LoadListener<ImageDataDto>() {
             @Override
             public void onLoadPageSuccess(ImageDataDto data) {
-                enableProgress(false);
+                enableSwipeRefreshProgress(false);
                 adapter.setItems(data.getItems());
             }
 
             @Override
             public void onLoadPageFailed(String message) {
-                enableProgress(false);
+                enableSwipeRefreshProgress(false);
                 showMessage(message);
             }
 
             @Override
             public void onPageLoading() {
-                enableProgress(true);
+                enableSwipeRefreshProgress(true);
             }
         });
     }
@@ -119,6 +134,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void showMessage(String message) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+    }
+
+    public void enableSwipeRefreshProgress(boolean isEnable) {
+        swipeRefreshLayout.setRefreshing(isEnable);
     }
 
     public void enableProgress(boolean isEnable) {
