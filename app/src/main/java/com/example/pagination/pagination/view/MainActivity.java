@@ -1,4 +1,4 @@
-package com.example.pagination.pagination;
+package com.example.pagination.pagination.view;
 
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -10,10 +10,11 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.example.pagination.pagination.PageCursorDelegate;
+import com.example.pagination.pagination.R;
 import com.example.pagination.pagination.datasource.ImagesDataSource;
 import com.example.pagination.pagination.datasource.ImagesRestMockDataSource;
 import com.example.pagination.pagination.model.ImageDataDto;
-import com.example.pagination.pagination.view.ImagesAdapter;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -47,9 +48,9 @@ public class MainActivity extends AppCompatActivity {
         adapter = new ImagesAdapter();
         imagesDataSource = new ImagesRestMockDataSource();
 
-        pageCursorDelegate = new PageCursorDelegate(10, 3, new PageCursorDelegate.RequestConsumer() {
+        pageCursorDelegate = new PageCursorDelegate<>(10, 3, new PageCursorDelegate.RequestConsumer<ImageDataDto>() {
             @Override
-            public Flowable request(String nextCursor, int pageSize) {
+            public Flowable<ImageDataDto> request(String nextCursor, int pageSize) {
                 return imagesDataSource.getImagesData(nextCursor, pageSize)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread());

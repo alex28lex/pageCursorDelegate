@@ -82,7 +82,7 @@ public class PageCursorDelegate<T extends PageCursorDelegate.CursorData> {
 
     //  public void paginate()
 
-    public interface LoadListener<T extends PageCursorDelegate.CursorData> {
+    public interface LoadListener<T> {
         void onPageLoading();
 
         void onLoadPageSuccess(T data);
@@ -95,7 +95,7 @@ public class PageCursorDelegate<T extends PageCursorDelegate.CursorData> {
         String provideNextCursor();
     }
 
-    public interface RequestConsumer<T extends PageCursorDelegate.CursorData> {
+    public interface RequestConsumer<T> {
         Flowable<T> request(String nextCursor, int pageSize);
     }
 }
