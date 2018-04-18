@@ -2,9 +2,6 @@ package com.example.pagination.pagination;
 
 import io.reactivex.Flowable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * Developed by Magora Team (magora-systems.com). 2017.
@@ -16,21 +13,10 @@ public class PageCursorDelegate<T extends PageCursorDelegate.CursorData> {
     public static final String FIRST_PAGE_CURSOR = null;
 
     private final RequestConsumer<T> requestConsumer;
-
-    @Getter
-    @Setter
     private String nextCursor;
-
-    @Getter
     private int pageSize;
-
-    @Getter
     private int countItemsBeforeEnd;
-
-    @Getter
-    @Setter
     private boolean isLoading;
-
     private Disposable disposable;
 
 
@@ -45,20 +31,16 @@ public class PageCursorDelegate<T extends PageCursorDelegate.CursorData> {
         isLoading = true;
         loadListener.onPageLoading();
         disposable = requestConsumer.request(pageCursor, pageSize)
-                .subscribe(new Consumer<T>() {
-                    @Override
-                    public void accept(T t) throws Exception {
-                        isLoading = false;
-                        nextCursor = t.provideNextCursor();
-                        loadListener.onLoadPageSuccess(t);
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        isLoading = false;
-                        loadListener.onLoadPageFailed(throwable.getMessage());
-                    }
-                });
+                .subscribe(
+                        t -> {
+                            isLoading = false;
+                            nextCursor = t.provideNextCursor();
+                            loadListener.onLoadPageSuccess(t);
+                        },
+                        throwable -> {
+                            isLoading = false;
+                            loadListener.onLoadPageFailed(throwable.getMessage());
+                        });
     }
 
     public void paginate(int lastVisiblePosition, int adapterItemCount, final LoadListener<T> loadListener) {
@@ -79,8 +61,6 @@ public class PageCursorDelegate<T extends PageCursorDelegate.CursorData> {
         if (disposable != null)
             disposable.dispose();
     }
-
-    //  public void paginate()
 
     public interface LoadListener<T> {
         void onPageLoading();

@@ -48,14 +48,10 @@ public class MainActivity extends AppCompatActivity {
         adapter = new ImagesAdapter();
         imagesDataSource = new ImagesRestMockDataSource();
 
-        pageCursorDelegate = new PageCursorDelegate<>(10, 3, new PageCursorDelegate.RequestConsumer<ImageDataDto>() {
-            @Override
-            public Flowable<ImageDataDto> request(String nextCursor, int pageSize) {
-                return imagesDataSource.getImagesData(nextCursor, pageSize)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread());
-            }
-        });
+        pageCursorDelegate = new PageCursorDelegate<>(10, 3,
+                (nextCursor, pageSize) -> imagesDataSource.getImagesData(nextCursor, pageSize)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread()));
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -82,12 +78,7 @@ public class MainActivity extends AppCompatActivity {
 
     protected void initSwipeRefreshLayout() {
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                loadImagesRequest();
-            }
-        });
+        swipeRefreshLayout.setOnRefreshListener(this::loadImagesRequest);
     }
 
     private void paginateImagesRequest(int lastVisiblePosition, int adapteritemsCount) {
